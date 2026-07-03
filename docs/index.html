@@ -149,9 +149,10 @@
     <ol>
       <li>Download the DMG from the <a href="https://github.com/lyndon050516/LiveWall/releases/latest">latest release</a>.</li>
       <li>Drag <strong>LiveWall</strong> into Applications.</li>
-      <li>The first time, right-click the app and choose <strong>Open</strong>. LiveWall is ad-hoc signed but not notarized (notarization needs a paid developer account), so Gatekeeper blocks a normal double-click on first launch.</li>
+      <li>Open LiveWall once. macOS will say it could not verify the app is free of malware — click <strong>Done</strong> (not Move to Trash). LiveWall is ad-hoc signed but not notarized (notarization needs a paid developer account), so Gatekeeper blocks the first launch.</li>
+      <li>Open <strong>System Settings</strong> &rarr; <strong>Privacy &amp; Security</strong>, scroll down to the message saying LiveWall was blocked, click <strong>Open Anyway</strong>, and confirm. That's it — you only do this once.</li>
     </ol>
-    <p>If you'd rather clear the quarantine flag from the terminal:</p>
+    <p>Faster: skip the Settings dance and clear the quarantine flag from the terminal after dragging the app to Applications:</p>
     <pre><code>xattr -dr com.apple.quarantine /Applications/LiveWall.app</code></pre>
   </section>
 
@@ -186,6 +187,11 @@ cd LiveWall
     });
   })();
 </script>
+
+<!-- Page-view analytics (GoatCounter). To activate: create a free account at goatcounter.com, then replace YOURCODE below and remove the surrounding comment markers. -->
+<!--
+<script data-goatcounter="https://YOURCODE.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+-->
 
 </body>
 </html>

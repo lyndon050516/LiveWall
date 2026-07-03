@@ -8,6 +8,7 @@ Live 4K wallpapers for your Mac, without draining your battery.
 ![Swift](https://img.shields.io/badge/Swift-AppKit%20%2B%20AVFoundation-F05138?logo=swift&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-5B5BE6)
 [![Latest release](https://img.shields.io/github/v/release/lyndon050516/LiveWall?label=release&color=6FE7DD)](https://github.com/lyndon050516/LiveWall/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/lyndon050516/LiveWall/total?color=5B5BE6&label=downloads)](https://github.com/lyndon050516/LiveWall/releases)
 
 LiveWall is a free, open-source macOS menu-bar app that turns any video or photo
 into your desktop wallpaper. It lives in the menu bar (no Dock icon), plays
@@ -32,11 +33,14 @@ from the ground up to sip power.
 1. Download the latest DMG from the [releases page](https://github.com/lyndon050516/LiveWall/releases/latest).
 2. Open the DMG and drag **LiveWall** into your Applications folder.
 3. Because the app is ad-hoc signed and **not notarized**, macOS Gatekeeper
-   will block the first launch. Right-click (or Control-click) **LiveWall.app**
-   in Applications and choose **Open**, then confirm in the dialog. You only
-   need to do this once.
+   will block the first launch with a dialog saying Apple could not verify
+   LiveWall is free of malware. Click **Done** (not **Move to Trash**).
+4. Open **System Settings** → **Privacy & Security**, scroll down to the
+   message saying LiveWall was blocked, click **Open Anyway**, and confirm.
+   You only need to do this once.
 
-If you prefer the terminal, you can clear the quarantine attribute instead:
+Faster: skip the Settings dance entirely by clearing the quarantine attribute
+in the terminal after dragging the app to Applications:
 
 ```sh
 xattr -dr com.apple.quarantine /Applications/LiveWall.app
