@@ -30,6 +30,19 @@ from the ground up to sip power.
 
 ## Download and Install
 
+The easiest way is one command in the terminal:
+
+```sh
+curl -fsSL https://lyndon050516.github.io/LiveWall/install.sh | bash
+```
+
+It downloads the latest release, installs it to /Applications, and clears the
+Gatekeeper quarantine flag, so there's no trip to System Settings.
+[Read the script first](https://github.com/lyndon050516/LiveWall/blob/main/docs/install.sh)
+if you like.
+
+Prefer not to pipe curl into bash? Install manually:
+
 1. Download the latest DMG from the [releases page](https://github.com/lyndon050516/LiveWall/releases/latest).
 2. Open the DMG and drag **LiveWall** into your Applications folder.
 3. Because the app is ad-hoc signed and **not notarized**, macOS Gatekeeper
