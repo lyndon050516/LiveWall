@@ -4,297 +4,188 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LiveWall — Live 4K wallpapers for your Mac</title>
-<meta name="description" content="LiveWall is a free, open-source macOS menu-bar app that turns any video or photo into a battery-smart live desktop wallpaper. 4K HEVC, one shared decode, 1-3% CPU.">
+<meta name="description" content="LiveWall is a free, open-source Mac menu bar app that plays a looping video behind your desktop icons. Native Swift, zero dependencies, and careful about your battery.">
 <meta property="og:title" content="LiveWall — Live 4K wallpapers for your Mac">
-<meta property="og:description" content="Turn any video or photo into a battery-smart live wallpaper. Free, open source, native Swift. Just 1-3% CPU on Apple Silicon.">
+<meta property="og:description" content="A free, open-source Mac menu bar app that plays a looping video behind your desktop icons. Native Swift, zero dependencies, careful about your battery.">
 <meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Cdefs%3E%3ClinearGradient%20id='g'%20x1='0'%20y1='0'%20x2='1'%20y2='1'%3E%3Cstop%20offset='0'%20stop-color='%235B5BE6'/%3E%3Cstop%20offset='1'%20stop-color='%236FE7DD'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width='64'%20height='64'%20rx='15'%20fill='url(%23g)'/%3E%3Ccircle%20cx='32'%20cy='32'%20r='11'%20fill='none'%20stroke='%230B0D14'%20stroke-width='4'/%3E%3Ccircle%20cx='32'%20cy='32'%20r='3.5'%20fill='%230B0D14'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='15'%20fill='%235B5BE6'/%3E%3Ccircle%20cx='32'%20cy='32'%20r='11'%20fill='none'%20stroke='%230f1115'%20stroke-width='4'/%3E%3Ccircle%20cx='32'%20cy='32'%20r='3.5'%20fill='%230f1115'/%3E%3C/svg%3E">
 <style>
   :root {
-    --bg: #0B0D14;
-    --bg-soft: #11141F;
-    --panel: #151827;
-    --border: rgba(255,255,255,0.09);
-    --text: #EEF1F8;
-    --muted: #9AA3B8;
-    --brand-a: #5B5BE6;
-    --brand-b: #6FE7DD;
-    --shadow: 0 30px 80px -30px rgba(0,0,0,0.85);
+    --bg: #0f1115;
+    --text: #ece9e2;
+    --muted: #a09d96;
+    --accent: #7d7df0;
+    --accent-btn: #5B5BE6;
+    --border: #2a2d35;
+    --code-bg: #16181e;
   }
   @media (prefers-color-scheme: light) {
     :root {
-      --bg: #F6F7FB;
-      --bg-soft: #FFFFFF;
-      --panel: #FFFFFF;
-      --border: rgba(10,14,30,0.10);
-      --text: #10131E;
-      --muted: #55607A;
-      --shadow: 0 30px 70px -35px rgba(20,30,80,0.35);
+      --bg: #fbfaf7;
+      --text: #1d1f24;
+      --muted: #5d5f66;
+      --accent: #4747c9;
+      --accent-btn: #5B5BE6;
+      --border: #dcdad3;
+      --code-bg: #f0efe9;
     }
   }
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
   body {
     margin: 0;
     background: var(--bg);
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    line-height: 1.6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 16.5px;
+    line-height: 1.7;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
+    border-top: 2px solid transparent;
+    border-image: linear-gradient(90deg, var(--accent-btn), transparent 70%) 1;
   }
-  a { color: inherit; }
-  .wrap { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 24px; }
-  .grad-text {
-    background: linear-gradient(120deg, var(--brand-a), var(--brand-b));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  main, footer { max-width: 700px; margin: 0 auto; padding: 0 22px; }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:hover { text-decoration-thickness: 2px; }
+  a:focus-visible, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  header.site { padding: 72px 0 8px; }
+  h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .tagline { margin: 0 0 28px; font-size: 18px; color: var(--muted); }
+  .actions { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block;
+    background: var(--accent-btn);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 11px 22px;
+    border-radius: 8px;
   }
+  .btn:hover { background: #4d4dd4; }
+  .fineprint { margin: 12px 0 0; font-size: 13.5px; color: var(--muted); }
 
-  /* ---------- Header ---------- */
-  header {
-    position: sticky; top: 0; z-index: 20;
-    backdrop-filter: saturate(160%) blur(14px);
-    -webkit-backdrop-filter: saturate(160%) blur(14px);
-    background: color-mix(in srgb, var(--bg) 72%, transparent);
-    border-bottom: 1px solid var(--border);
+  figure.demo { margin: 44px 0 0; }
+  .demo-frame {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #000;
+    line-height: 0;
   }
-  .nav { display: flex; align-items: center; justify-content: space-between; height: 62px; }
-  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -0.02em; font-size: 18px; }
-  .logo { width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(135deg, var(--brand-a), var(--brand-b)); position: relative; flex: none; }
-  .logo::after { content:""; position:absolute; inset:7px; border:2.5px solid var(--bg); border-radius:50%; }
-  .nav-links { display: flex; align-items: center; gap: 22px; font-size: 14px; color: var(--muted); }
-  .nav-links a { text-decoration: none; transition: color .2s; }
-  .nav-links a:hover { color: var(--text); }
-  .nav-cta { display:inline-block; padding: 8px 16px; border-radius: 10px; font-weight:600; color:#fff; text-decoration:none;
-    background: linear-gradient(120deg, var(--brand-a), var(--brand-b)); }
-  @media (max-width: 620px) { .nav-links .hide-sm { display:none; } }
+  .demo-frame video, .demo-frame img { width: 100%; height: auto; display: block; }
+  figcaption { margin-top: 10px; font-size: 14px; color: var(--muted); line-height: 1.5; }
 
-  /* ---------- Aurora hero ---------- */
-  .hero { position: relative; padding: 96px 0 64px; text-align: center; overflow: hidden; }
-  .aurora { position: absolute; inset: -30% -20%; z-index: 0; filter: blur(70px); opacity: 0.9; pointer-events: none; }
-  .blob { position: absolute; width: 60vw; height: 60vw; max-width: 720px; max-height: 720px; border-radius: 50%; mix-blend-mode: screen; }
-  .b1 { background: radial-gradient(circle at 30% 30%, #5B5BE6, transparent 60%); top: -10%; left: -5%; animation: drift1 22s ease-in-out infinite alternate; }
-  .b2 { background: radial-gradient(circle at 70% 40%, #6FE7DD, transparent 60%); top: 0%; right: -10%; animation: drift2 26s ease-in-out infinite alternate; }
-  .b3 { background: radial-gradient(circle at 50% 60%, #8A5BFF, transparent 62%); bottom: -25%; left: 25%; animation: drift3 30s ease-in-out infinite alternate; }
-  @media (prefers-color-scheme: light) { .aurora { opacity: 0.55; } }
-  @keyframes drift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(12%, 8%) scale(1.15); } }
-  @keyframes drift2 { from { transform: translate(0,0) scale(1.1); } to { transform: translate(-10%, 12%) scale(0.95); } }
-  @keyframes drift3 { from { transform: translate(0,0) scale(1); } to { transform: translate(6%, -12%) scale(1.2); } }
-  @media (prefers-reduced-motion: reduce) { .b1,.b2,.b3 { animation: none; } }
-  .hero-inner { position: relative; z-index: 1; }
-  .eyebrow { display:inline-block; font-size:13px; letter-spacing:0.06em; text-transform:uppercase; color: var(--muted);
-    border:1px solid var(--border); padding:6px 14px; border-radius:999px; margin-bottom:26px; }
-  h1.wordmark { font-size: clamp(56px, 12vw, 118px); line-height: 0.95; margin: 0; letter-spacing: -0.045em; font-weight: 800; }
-  .tagline { font-size: clamp(20px, 3.6vw, 30px); font-weight: 600; letter-spacing:-0.02em; margin: 22px 0 10px; }
-  .subtag { color: var(--muted); max-width: 560px; margin: 0 auto; font-size: 17px; }
-  .cta-row { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top: 36px; }
-  .btn { display:inline-flex; align-items:center; gap:9px; padding: 14px 26px; border-radius: 13px; font-weight:600; font-size:16px; text-decoration:none; transition: transform .15s ease, box-shadow .2s ease; }
-  .btn-primary { color:#fff; background: linear-gradient(120deg, var(--brand-a), var(--brand-b)); box-shadow: 0 12px 30px -10px rgba(91,91,230,0.6); }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -12px rgba(91,91,230,0.7); }
-  .btn-ghost { color: var(--text); border:1px solid var(--border); background: var(--bg-soft); }
-  .btn-ghost:hover { transform: translateY(-2px); }
-  .req { margin-top: 16px; font-size: 13px; color: var(--muted); }
+  section { margin-top: 56px; }
+  h2 {
+    font-size: 19px;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  p { margin: 0 0 14px; }
+  ul, ol { margin: 0 0 14px; padding-left: 24px; }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--muted); }
+  strong { font-weight: 600; }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; }
+  code { background: var(--code-bg); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    overflow-x: auto;
+    margin: 0 0 14px;
+    line-height: 1.5;
+  }
+  pre code { background: none; border: none; padding: 0; }
 
-  /* ---------- Section frame ---------- */
-  section { position: relative; padding: 72px 0; }
-  .section-title { font-size: clamp(28px, 5vw, 40px); letter-spacing: -0.03em; font-weight: 800; margin: 0 0 12px; text-align:center; }
-  .section-sub { color: var(--muted); text-align: center; max-width: 620px; margin: 0 auto 44px; font-size: 17px; }
-
-  /* ---------- Screenshot showcase ---------- */
-  .shot-window { max-width: 940px; margin: 0 auto; border-radius: 16px; overflow: hidden; border:1px solid var(--border);
-    background: var(--panel); box-shadow: var(--shadow); }
-  .shot-bar { display:flex; align-items:center; gap:8px; padding: 12px 16px; border-bottom:1px solid var(--border); background: color-mix(in srgb, var(--panel) 80%, black); }
-  .dot { width:12px; height:12px; border-radius:50%; }
-  .dot.r{background:#ff5f57;} .dot.y{background:#febc2e;} .dot.g{background:#28c840;}
-  .shot-title { margin-left: 10px; font-size: 13px; color: var(--muted); }
-  .shot-window img { display:block; width:100%; height:auto; background: linear-gradient(135deg, #151827, #0B0D14); }
-
-  /* ---------- Feature grid ---------- */
-  .grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
-  .card { background: var(--panel); border:1px solid var(--border); border-radius: 16px; padding: 28px; }
-  .card .ic { width: 44px; height: 44px; border-radius: 11px; display:grid; place-items:center; margin-bottom: 18px;
-    background: linear-gradient(135deg, rgba(91,91,230,0.22), rgba(111,231,221,0.18)); border:1px solid var(--border); }
-  .card h3 { margin: 0 0 8px; font-size: 19px; letter-spacing: -0.02em; }
-  .card p { margin: 0; color: var(--muted); font-size: 15px; }
-  .card svg { width: 22px; height: 22px; }
-
-  /* ---------- Power section ---------- */
-  .power { background: var(--bg-soft); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
-  .power-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items:center; }
-  @media (max-width: 800px) { .power-grid { grid-template-columns: 1fr; gap: 32px; } }
-  .gates { list-style:none; margin: 0; padding: 0; display:grid; gap: 12px; }
-  .gates li { display:flex; align-items:center; gap: 14px; background: var(--panel); border:1px solid var(--border);
-    border-radius: 12px; padding: 14px 16px; font-size: 15px; }
-  .gates .badge { flex:none; width:26px; height:26px; border-radius: 8px; display:grid; place-items:center; font-size:13px; font-weight:700; color:#fff;
-    background: linear-gradient(135deg, var(--brand-a), var(--brand-b)); }
-  .stat { text-align: left; }
-  .stat .big { font-size: clamp(56px, 11vw, 92px); font-weight: 800; letter-spacing: -0.05em; line-height: 1; }
-  .stat .unit { color: var(--muted); font-size: 18px; margin-top: 10px; }
-  .stat .row2 { margin-top: 30px; padding-top: 26px; border-top:1px solid var(--border); }
-  .stat .zero { font-size: clamp(40px,8vw,60px); font-weight:800; letter-spacing:-0.04em; }
-
-  /* ---------- Install note ---------- */
-  .note { max-width: 760px; margin: 0 auto; background: var(--panel); border:1px solid var(--border); border-radius: 16px; padding: 28px 30px; }
-  .note h3 { margin: 0 0 10px; font-size: 20px; display:flex; align-items:center; gap:10px; }
-  .note p { color: var(--muted); margin: 0 0 14px; }
-  .note ol { color: var(--muted); margin: 0 0 16px; padding-left: 20px; }
-  .note li { margin-bottom: 6px; }
-  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-  pre { background: var(--bg); border:1px solid var(--border); border-radius: 10px; padding: 14px 16px; overflow-x:auto; font-size: 13.5px; color: var(--brand-b); margin: 0; }
-  .inline-code { background: color-mix(in srgb, var(--panel) 60%, var(--bg)); border:1px solid var(--border); border-radius:6px; padding: 2px 7px; font-size: 13px; }
-
-  /* ---------- Footer ---------- */
-  footer { border-top: 1px solid var(--border); padding: 44px 0; }
-  .foot { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; color: var(--muted); font-size: 14px; }
-  .foot a { color: var(--muted); text-decoration:none; }
-  .foot a:hover { color: var(--text); }
-  .foot-links { display:flex; gap: 22px; }
+  footer { margin-top: 72px; padding-top: 24px; padding-bottom: 56px; border-top: 1px solid var(--border); font-size: 14px; color: var(--muted); }
+  footer a { color: var(--muted); }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="wrap nav">
-    <div class="brand"><span class="logo" aria-hidden="true"></span>LiveWall</div>
-    <nav class="nav-links">
-      <a href="#features" class="hide-sm">Features</a>
-      <a href="#power" class="hide-sm">Battery</a>
-      <a href="https://github.com/lyndon050516/LiveWall" class="hide-sm">GitHub</a>
-      <a href="https://github.com/lyndon050516/LiveWall/releases/latest" class="nav-cta">Download</a>
-    </nav>
-  </div>
-</header>
-
 <main>
-  <section class="hero">
-    <div class="aurora" aria-hidden="true">
-      <div class="blob b1"></div>
-      <div class="blob b2"></div>
-      <div class="blob b3"></div>
+  <header class="site">
+    <h1>LiveWall</h1>
+    <p class="tagline">A free, open-source Mac menu bar app that plays a looping video behind your desktop icons.</p>
+    <div class="actions">
+      <a class="btn" href="https://github.com/lyndon050516/LiveWall/releases/latest">Download for Mac</a>
+      <a href="https://github.com/lyndon050516/LiveWall">View source on GitHub</a>
     </div>
-    <div class="wrap hero-inner">
-      <span class="eyebrow">Free and open source for macOS</span>
-      <h1 class="wordmark grad-text">LiveWall</h1>
-      <p class="tagline">Live 4K wallpapers for your Mac.</p>
-      <p class="subtag">Turn any video or photo into a desktop wallpaper that loops flawlessly across every display, and is engineered to barely touch your battery.</p>
-      <div class="cta-row">
-        <a class="btn btn-primary" href="https://github.com/lyndon050516/LiveWall/releases/latest">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3v10.6l3.3-3.3 1.4 1.4L12 17.4 7.3 11.7l1.4-1.4L12 13.6V3h0zM5 19h14v2H5z"/></svg>
-          Download for Mac
-        </a>
-        <a class="btn btn-ghost" href="https://github.com/lyndon050516/LiveWall">View on GitHub</a>
-      </div>
-      <p class="req">Requires macOS 14 or later. Apple Silicon optimized.</p>
+    <p class="fineprint">Free. macOS 14+. Apple Silicon. 1.4&nbsp;MB.</p>
+  </header>
+
+  <figure class="demo">
+    <div class="demo-frame">
+      <video id="demo" src="assets/demo.mp4" poster="assets/gallery.png" autoplay muted loop playsinline></video>
     </div>
+    <figcaption>A 4K video loop playing behind the desktop — this is a screen recording, not a mockup.</figcaption>
+  </figure>
+
+  <section id="what-it-does">
+    <h2>What it does</h2>
+    <p>Pick a video, and LiveWall renders it one layer below your desktop icons, so it sits behind everything on screen and loops without a seam. I built this because every video-wallpaper app I found was paid, Windows-only, or ate my battery.</p>
+    <ul>
+      <li>Plays any MP4, MOV, or M4V video, or sets a PNG, JPEG, or HEIC image</li>
+      <li>Gallery window with drag-and-drop import</li>
+      <li>Fills every display from a single hardware decode</li>
+      <li>Lives in the menu bar only — no Dock icon</li>
+      <li>Launches at login if you want it to</li>
+      <li>Remembers your wallpaper across restarts</li>
+    </ul>
   </section>
 
-  <section id="showcase" style="padding-top:8px;">
-    <div class="wrap">
-      <div class="shot-window">
-        <div class="shot-bar" aria-hidden="true">
-          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-          <span class="shot-title">LiveWall — Gallery</span>
-        </div>
-        <img src="assets/gallery.png" alt="The LiveWall gallery window showing a grid of live wallpaper thumbnails ready to apply.">
-      </div>
-    </div>
+  <section id="battery">
+    <h2>Battery</h2>
+    <p>A wallpaper should never be the reason your fans spin up, so playback pauses whenever it can't be seen or shouldn't be running: when the screen locks, when displays sleep, when the wallpaper is fully covered by windows, when Low Power Mode is on, or — optionally — whenever you're on battery.</p>
+    <p>While playing a 4K HEVC loop on Apple Silicon, LiveWall uses roughly 1&ndash;3% CPU. Paused, it's effectively zero. Static images go through macOS's own wallpaper API, so nothing runs at all. And it never keeps your display awake.</p>
   </section>
 
-  <section id="features">
-    <div class="wrap">
-      <h2 class="section-title">Everything a wallpaper should be</h2>
-      <p class="section-sub">Native Swift, AppKit and AVFoundation. Zero third-party dependencies. It lives in your menu bar with no Dock icon.</p>
-      <div class="grid">
-        <div class="card">
-          <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="url(#fg)" stroke-width="2"><defs><linearGradient id="fg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5B5BE6"/><stop offset="1" stop-color="#6FE7DD"/></linearGradient></defs><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z" fill="url(#fg)"/></svg></div>
-          <h3>Any video, any photo</h3>
-          <p>Play MP4, MOV or M4V video (HEVC recommended), or set a PNG, JPEG or HEIC image. Import by drag-and-drop into the gallery.</p>
-        </div>
-        <div class="card">
-          <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="url(#fg)" stroke-width="2"><rect x="2" y="7" width="17" height="10" rx="2.5"/><path d="M6 12h7" stroke-width="2.5"/><path d="M22 10v4" stroke-width="2.5"/></svg></div>
-          <h3>Battery-smart by design</h3>
-          <p>Auto-pauses on lock, display sleep, full occlusion, Low Power Mode, and optionally on battery. It never keeps your display awake.</p>
-        </div>
-        <div class="card">
-          <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="url(#fg)" stroke-width="2"><path d="M12 3l2.5 5 5.5.8-4 3.9 1 5.5L12 15.5 7 18.2l1-5.5-4-3.9L9.5 8z"/></svg></div>
-          <h3>Native and tiny</h3>
-          <p>One shared hardware decode feeds every display through a single AVQueuePlayer, with gapless looping and muted playback.</p>
-        </div>
-      </div>
-    </div>
+  <section id="install">
+    <h2>Install</h2>
+    <ol>
+      <li>Download the DMG from the <a href="https://github.com/lyndon050516/LiveWall/releases/latest">latest release</a>.</li>
+      <li>Drag <strong>LiveWall</strong> into Applications.</li>
+      <li>The first time, right-click the app and choose <strong>Open</strong>. LiveWall is ad-hoc signed but not notarized (notarization needs a paid developer account), so Gatekeeper blocks a normal double-click on first launch.</li>
+    </ol>
+    <p>If you'd rather clear the quarantine flag from the terminal:</p>
+    <pre><code>xattr -dr com.apple.quarantine /Applications/LiveWall.app</code></pre>
   </section>
 
-  <section id="power" class="power">
-    <div class="wrap">
-      <h2 class="section-title">Built to sip power</h2>
-      <p class="section-sub">A live wallpaper should never be the reason your fans spin up. LiveWall gates playback behind five conditions and drops decoding the moment any one of them is true.</p>
-      <div class="power-grid">
-        <ul class="gates">
-          <li><span class="badge">1</span> Screen is locked</li>
-          <li><span class="badge">2</span> Display is asleep</li>
-          <li><span class="badge">3</span> Wallpaper is fully occluded</li>
-          <li><span class="badge">4</span> Low Power Mode is on</li>
-          <li><span class="badge">5</span> Running on battery (toggleable)</li>
-        </ul>
-        <div class="stat">
-          <div class="big grad-text">1&ndash;3%</div>
-          <div class="unit">CPU while playing 4K HEVC on Apple Silicon.</div>
-          <div class="row2">
-            <div class="zero grad-text">0.0%</div>
-            <div class="unit">when any pause gate is active.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="how">
-    <div class="wrap">
-      <h2 class="section-title">How it works</h2>
-      <p class="section-sub">Wallpaper windows render one level below the desktop icons, so your video sits behind everything on screen. Static images skip the engine entirely and use Apple's native wallpaper API, so nothing runs at all.</p>
-      <div class="shot-window" style="max-width:760px;">
-        <div class="shot-bar" aria-hidden="true">
-          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-          <span class="shot-title">LiveWall — Menu bar</span>
-        </div>
-        <img src="assets/menubar.png" alt="The LiveWall menu-bar menu with controls to change wallpaper and toggle battery options.">
-      </div>
-    </div>
-  </section>
-
-  <section id="install" style="padding-top:8px;">
-    <div class="wrap">
-      <div class="note">
-        <h3><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#fg)" stroke-width="2" aria-hidden="true"><path d="M12 3l9 4v5c0 5-3.8 8-9 9-5.2-1-9-4-9-9V7z"/></svg> One honest install note</h3>
-        <p>LiveWall is ad-hoc signed but <strong>not notarized</strong>, so macOS Gatekeeper blocks the very first launch. It is safe, and the fix takes one step:</p>
-        <ol>
-          <li>Download the DMG and drag <strong>LiveWall</strong> into Applications.</li>
-          <li>Right-click (or Control-click) <strong>LiveWall.app</strong> and choose <strong>Open</strong>, then confirm.</li>
-        </ol>
-        <p>Prefer the terminal? Clear the quarantine flag instead:</p>
-        <pre>xattr -dr com.apple.quarantine /Applications/LiveWall.app</pre>
-      </div>
-      <div style="text-align:center; margin-top:36px;">
-        <a class="btn btn-primary" href="https://github.com/lyndon050516/LiveWall/releases/latest">Download for Mac</a>
-      </div>
-    </div>
+  <section id="build">
+    <h2>Build it yourself</h2>
+    <p>The whole app is plain Swift with zero third-party dependencies, MIT licensed. If you have Xcode installed:</p>
+    <pre><code>git clone https://github.com/lyndon050516/LiveWall.git
+cd LiveWall
+./scripts/build-app.sh</code></pre>
+    <p>That produces a ready-to-run <code>LiveWall.app</code>. If something breaks, <a href="https://github.com/lyndon050516/LiveWall/issues">open an issue</a> and I'll take a look.</p>
   </section>
 </main>
 
 <footer>
-  <div class="wrap foot">
-    <div class="brand"><span class="logo" aria-hidden="true"></span>LiveWall</div>
-    <div class="foot-links">
-      <a href="https://github.com/lyndon050516/LiveWall">GitHub</a>
-      <a href="https://github.com/lyndon050516/LiveWall/releases/latest">Releases</a>
-      <a href="https://github.com/lyndon050516/LiveWall/blob/main/LICENSE">MIT License</a>
-    </div>
-    <div>Built with Swift and AVFoundation.</div>
-  </div>
+  <a href="https://github.com/lyndon050516/LiveWall/blob/main/LICENSE">MIT</a> &middot; <a href="https://github.com/lyndon050516/LiveWall">GitHub</a> &middot; Made with Swift and AVFoundation
 </footer>
+
+<script>
+  (function () {
+    var v = document.getElementById('demo');
+    if (!v) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      v.removeAttribute('autoplay');
+      v.pause();
+      v.controls = true;
+    }
+    v.addEventListener('error', function () {
+      var img = document.createElement('img');
+      img.src = 'assets/gallery.png';
+      img.alt = 'The LiveWall gallery window showing wallpaper thumbnails.';
+      v.replaceWith(img);
+    });
+  })();
+</script>
 
 </body>
 </html>

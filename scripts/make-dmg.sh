@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP="$ROOT/LiveWall.app"
 DIST="$ROOT/dist"
-DMG="$DIST/LiveWall-1.0.0.dmg"
+DMG="$DIST/LiveWall-1.1.0.dmg"
 
 if [[ ! -d "$APP" ]]; then
     echo "LiveWall.app not found; building it first."

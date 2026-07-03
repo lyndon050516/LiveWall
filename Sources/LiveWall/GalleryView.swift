@@ -165,6 +165,9 @@ private struct WallpaperCell: View {
                 .overlay(alignment: .topLeading) {
                     if isVideo { liveBadge.padding(8) }
                 }
+                .overlay(alignment: .topTrailing) {
+                    removeButton.padding(8)
+                }
                 .overlay(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .strokeBorder(
@@ -188,7 +191,7 @@ private struct WallpaperCell: View {
         .contextMenu {
             Button("Reveal in Finder", action: onReveal)
             Divider()
-            Button("Delete", role: .destructive, action: onDelete)
+            Button("Remove from Gallery", role: .destructive, action: onDelete)
         }
         .task(id: url) {
             thumbnail = await ThumbnailProvider.shared.thumbnail(for: url)
@@ -207,6 +210,21 @@ private struct WallpaperCell: View {
                 ProgressView().controlSize(.small)
             }
         }
+    }
+
+    private var removeButton: some View {
+        Button(action: onDelete) {
+            Image(systemName: "xmark")
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 22, height: 22)
+                .background(.black.opacity(0.6), in: Circle())
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .opacity(hovering ? 1 : 0)
+        .animation(.easeOut(duration: 0.15), value: hovering)
+        .help("Remove from Gallery")
     }
 
     private var liveBadge: some View {
